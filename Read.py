@@ -6,11 +6,14 @@ import MFRC522
 import signal
 import time
 import subprocess
-import json, requests
+import requests
 
 server = 'http://192.168.1.115:8080'
 
 continue_reading = True
+
+subprocess.call(["gpio", "mode", "0", "out"])
+subprocess.call(["gpio", "mode", "1", "out"])
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
