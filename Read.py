@@ -8,7 +8,8 @@ import time
 import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
-import os
+#import os
+import time
 
 server = 'https://rc-check-in-backend.herokuapp.com'
 #username = os.environ['RC_CHECK_IN_USERNAME']
@@ -20,10 +21,13 @@ continue_reading = True
 subprocess.call(["gpio", "mode", "0", "out"])
 subprocess.call(["gpio", "mode", "1", "out"])
 
+def log(msg):
+    print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
+
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
     global continue_reading
-    print "Ctrl+C captured, ending read."
+    log("Ctrl+C captured, ending read.")
     continue_reading = False
     GPIO.cleanup()
 
@@ -58,16 +62,17 @@ def blink_check_out():
     time.sleep(1)
     subprocess.call(["gpio", "write", "1", "0"])
 
+# Welcome message
+log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
+
 # Contact the backend on start up
-#resp = requests.get(server+'/hello', auth=HTTPBasicAuth(username,password))
-resp = requests.get(server+'/hello')
+#resp = requests.get(server + '/hello', auth=HTTPBasicAuth(username,password))
+resp = requests.get(server + '/hello')
 helloStatus = resp.status_code
-print "hello response: " + str(helloStatus)
+log("Request /hello status:" + str(helloStatus)) 
 if helloStatus == 200:
-    print "hello ok"
     blink_hello()
 else:
-    print "hello error"
     blink_error()
 
 # Hook the SIGINT
@@ -75,10 +80,6 @@ signal.signal(signal.SIGINT, end_read)
 
 # Create an object of the class MFRC522
 MIFAREReader = MFRC522.MFRC522()
-
-# Welcome message
-print "Welcome to the rc-check-in-card-reader"
-print "Press Ctrl-C to stop."
 
 # This loop keeps checking for chips. If one is near it will get the UID and authenticate
 while continue_reading:
@@ -90,7 +91,7 @@ while continue_reading:
 
     # If a card is found
     if status == MIFAREReader.MI_OK:
-        print "Card detected"
+        log("Card detected")
 
     # Get the UID of the card
     (status,uid) = MIFAREReader.MFRC522_Anticoll()
@@ -100,10 +101,10 @@ while continue_reading:
     # If we have the UID, continue
     if status == MIFAREReader.MI_OK:
 
-        uidString = str(uid[0])+","+str(uid[1])+","+str(uid[2])+","+str(uid[3])
+        uidString = str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3])
 
         # Print UID
-        print "Card read UID: "+uidString
+        log("Card UID: " + uidString)
     
         # This is the default key for authentication
         # blue chip:
@@ -117,26 +118,25 @@ while continue_reading:
         # Authenticate
         #status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
 
-        print "status"+str(status) 
+        #print "status:" + str(status)
 
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
-            print "Authentication success"
-#            resp = requests.get(server+'/people/'+uidString+'/checkin', auth=HTTPBasicAuth(username,password))
-            resp = requests.get(server+'/people/'+uidString+'/checkin')
+            #print "Authentication success"
+#            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
+            resp = requests.get(server + '/people/' + uidString + '/checkin')
             checkinStatus = resp.status_code
-            print "checkin response: " + str(checkinStatus)
+            log("Request /checkin response: " + str(checkinStatus))
             if checkinStatus == 200:
                 if resp.content == 'true':
                     blink_check_in()
 		else:
                     blink_check_out()
             else:
-                print "checkin error"
                 blink_error()
             time.sleep(5)
         else:
-            print "Authentication error"
+            log("Authentication error")
             blink_error()
