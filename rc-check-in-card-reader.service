@@ -1,0 +1,13 @@
+[Unit]
+Description=rc-check-in-card-reader script
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=idle
+Restart=always
+RestartSec=3
+ExecStart=/usr/bin/python /opt/rc-check-in-card-reader/Read.py
+
+[Install]
+WantedBy=multi-user.target
