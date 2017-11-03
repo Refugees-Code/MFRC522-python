@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
+import sys
+import time
+#import os
 import RPi.GPIO as GPIO
 import MFRC522
 import signal
-import time
 import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
-#import os
-import time
 
 server = 'https://rc-check-in-backend.herokuapp.com'
 #username = os.environ['RC_CHECK_IN_USERNAME']
@@ -23,6 +23,13 @@ subprocess.call(["gpio", "mode", "1", "out"])
 
 def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
+    sys.stdout.flush()
+
+def green(on):
+    subprocess.call(["gpio", "write", "0", "1" if on else "0"])    
+
+def red(on):
+    subprocess.call(["gpio", "write", "1", "1" if on else "0"])    
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
@@ -32,35 +39,28 @@ def end_read(signal,frame):
     GPIO.cleanup()
 
 def blink_error():
-    subprocess.call(["gpio", "write", "1", "1"])
-    time.sleep(0.1)
-    subprocess.call(["gpio", "write", "1", "0"])
-    time.sleep(0.1)
-    subprocess.call(["gpio", "write", "1", "1"])
-    time.sleep(0.1)
-    subprocess.call(["gpio", "write", "1", "0"])
-    time.sleep(0.1)
-    subprocess.call(["gpio", "write", "1", "1"])
-    time.sleep(0.1)
-    subprocess.call(["gpio", "write", "1", "0"])
-    time.sleep(0.1)
+    for i in range(0,3):
+        red(True)
+        time.sleep(0.1)
+        red(False)
+        time.sleep(0,1)
 
 def blink_hello():
-    subprocess.call(["gpio", "write", "0", "1"])
-    subprocess.call(["gpio", "write", "1", "1"])
+    red(True)
+    green(True)
     time.sleep(1)
-    subprocess.call(["gpio", "write", "0", "0"])
-    subprocess.call(["gpio", "write", "1", "0"])
+    red(False)
+    green(False)
 
 def blink_check_in():
-    subprocess.call(["gpio", "write", "0", "1"])
+    green(True)
     time.sleep(1)
-    subprocess.call(["gpio", "write", "0", "0"])
+    green(False)
 
 def blink_check_out():
-    subprocess.call(["gpio", "write", "1", "1"])
+    red(True)
     time.sleep(1)
-    subprocess.call(["gpio", "write", "1", "0"])
+    red(False)
 
 # Welcome message
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
@@ -69,7 +69,7 @@ log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 #resp = requests.get(server + '/hello', auth=HTTPBasicAuth(username,password))
 resp = requests.get(server + '/hello')
 helloStatus = resp.status_code
-log("Request /hello status:" + str(helloStatus)) 
+log("Request /hello status: " + str(helloStatus)) 
 if helloStatus == 200:
     blink_hello()
 else:
@@ -96,8 +96,6 @@ while continue_reading:
     # Get the UID of the card
     (status,uid) = MIFAREReader.MFRC522_Anticoll()
 
-    #print "status"+str(status)+","+str(uid) 
-
     # If we have the UID, continue
     if status == MIFAREReader.MI_OK:
 
@@ -106,25 +104,13 @@ while continue_reading:
         # Print UID
         log("Card UID: " + uidString)
     
-        # This is the default key for authentication
-        # blue chip:
-        #key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
-        # white card:
-        #key = [0xD3,0xF7,0xD3,0xF7,0xD3,0XF7]
-        
         # Select the scanned tag
         MIFAREReader.MFRC522_SelectTag(uid)
-
-        # Authenticate
-        #status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
-
-        #print "status:" + str(status)
 
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
-            #print "Authentication success"
 #            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
             resp = requests.get(server + '/people/' + uidString + '/checkin')
             checkinStatus = resp.status_code
