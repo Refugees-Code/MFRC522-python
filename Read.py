@@ -43,7 +43,7 @@ def blink_error():
         red(True)
         time.sleep(0.1)
         red(False)
-        time.sleep(0,1)
+        time.sleep(0.1)
 
 def blink_hello():
     red(True)
