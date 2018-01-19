@@ -12,6 +12,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 server = 'https://rc-check-in-backend.herokuapp.com'
+sadra_server = 'https://xsadra.cf/checkin/data.php'
 #username = os.environ['RC_CHECK_IN_USERNAME']
 #password = os.environ['RC_CHECK_IN_PASSWORD']
 
@@ -26,10 +27,10 @@ def log(msg):
     sys.stdout.flush()
 
 def green(on):
-    subprocess.call(["gpio", "write", "0", "1" if on else "0"])    
+    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
 
 def red(on):
-    subprocess.call(["gpio", "write", "1", "1" if on else "0"])    
+    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
@@ -69,7 +70,7 @@ log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 #resp = requests.get(server + '/hello', auth=HTTPBasicAuth(username,password))
 resp = requests.get(server + '/hello')
 helloStatus = resp.status_code
-log("Request /hello status: " + str(helloStatus)) 
+log("Request /hello status: " + str(helloStatus))
 if helloStatus == 200:
     blink_hello()
 else:
@@ -83,11 +84,11 @@ MIFAREReader = MFRC522.MFRC522()
 
 # This loop keeps checking for chips. If one is near it will get the UID and authenticate
 while continue_reading:
-    
-    # Scan for cards    
+
+    # Scan for cards
     (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
 
-    #print "status"+str(status)+","+str(TagType) 
+    #print "status"+str(status)+","+str(TagType)
 
     # If a card is found
     if status == MIFAREReader.MI_OK:
@@ -103,7 +104,7 @@ while continue_reading:
 
         # Print UID
         log("Card UID: " + uidString)
-    
+
         # Select the scanned tag
         MIFAREReader.MFRC522_SelectTag(uid)
 
@@ -111,8 +112,14 @@ while continue_reading:
         if status == MIFAREReader.MI_OK:
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
+
+            #Send data to Sadra Server for Check in BOT
+            requests.post(sadra_server,data={'userid': uidString})
+
 #            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
             resp = requests.get(server + '/people/' + uidString + '/checkin')
+
+
             checkinStatus = resp.status_code
             log("Request /checkin response: " + str(checkinStatus))
             if checkinStatus == 200:
