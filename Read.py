@@ -3,7 +3,7 @@
 
 import sys
 import time
-#import os
+import os
 import RPi.GPIO as GPIO
 import MFRC522
 import signal
@@ -12,9 +12,10 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 server = 'https://rc-check-in-backend.herokuapp.com'
-sadra_server = 'https://xsadra.cf/checkin/data.php'
-#username = os.environ['RC_CHECK_IN_USERNAME']
-#password = os.environ['RC_CHECK_IN_PASSWORD']
+#sadra_server = 'https://xsadra.cf/checkin/data.php'
+server = os.environ['RC_CHECK_IN_SERVER']
+username = os.environ['RC_CHECK_IN_USERNAME']
+password = os.environ['RC_CHECK_IN_PASSWORD']
 
 continue_reading = True
 
@@ -67,8 +68,7 @@ def blink_check_out():
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 
 # Contact the backend on start up
-#resp = requests.get(server + '/hello', auth=HTTPBasicAuth(username,password))
-resp = requests.get(server + '/hello')
+resp = requests.get(server + '/hello', auth=HTTPBasicAuth(username,password))
 helloStatus = resp.status_code
 log("Request /hello status: " + str(helloStatus))
 if helloStatus == 200:
@@ -114,11 +114,9 @@ while continue_reading:
             MIFAREReader.MFRC522_StopCrypto1()
 
             #Send data to Sadra Server for Check in BOT
-            requests.post(sadra_server,data={'userid': uidString})
+#            requests.post(sadra_server,data={'userid': uidString})
 
-#            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
-            resp = requests.get(server + '/people/' + uidString + '/checkin')
-
+            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
 
             checkinStatus = resp.status_code
             log("Request /checkin response: " + str(checkinStatus))
