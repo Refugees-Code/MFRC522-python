@@ -58,6 +58,6 @@ sudo systemctl start rc-check-in-card-reader.service
 
 ### Related repositories:
 
-Backend: https://github.com/RefugeesCodeAT/rc-check-in-backend
+Backend: https://github.com/RefugeesCodeAT/rc-check-in-backend  
 Frontend: https://github.com/RefugeesCodeAT/Attendance
 
