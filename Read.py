@@ -10,8 +10,8 @@ import signal
 import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
+import Adafruit_CharLCD as LCD
 
-server = 'https://rc-check-in-backend.herokuapp.com'
 #sadra_server = 'https://xsadra.cf/checkin/data.php'
 server = os.environ['RC_CHECK_IN_SERVER']
 username = os.environ['RC_CHECK_IN_USERNAME']
@@ -19,19 +19,46 @@ password = os.environ['RC_CHECK_IN_PASSWORD']
 
 continue_reading = True
 
+
 # Set gpio mode for leds
-subprocess.call(["gpio", "mode", "0", "out"])
-subprocess.call(["gpio", "mode", "1", "out"])
+#subprocess.call(["gpio", "mode", "0", "out"])
+#subprocess.call(["gpio", "mode", "1", "out"])
+
+def LCDInit()
+    # Please note that are using BMC number like (GPIO-18) and not raspberry pi pins number
+    lcd_rs        = 18
+    lcd_en        = 23
+    lcd_d4        = 12
+    lcd_d5        = 16
+    lcd_d6        = 20
+    lcd_d7        = 21
+    lcd_backlight = 4
+    lcd_columns = 16
+    lcd_lines  = 2
+    return LCD.Adafruit_CharLCD(lcd_rs, lcd_en, lcd_d4, lcd_d5,
+                            lcd_d6, lcd_d7, lcd_columns, lcd_lines,
+                            lcd_backlight)
+def lcd_log(message)
+    #lcd.message('IP %s' %(ipaddr))
+    if len(message > 16)
+        lcd.message('%s\n' %(message[0:16]) )
+        lcd.message(message[16:])
+    else
+        lcd.message(message)
+    time.sleep(5)
+    lcd.clear()
+    
+    
 
 def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
     sys.stdout.flush()
 
-def green(on):
-    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
+#def green(on):
+#    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
 
-def red(on):
-    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
+#def red(on):
+#    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
@@ -55,16 +82,20 @@ def blink_hello():
     green(False)
 
 def blink_check_in():
-    green(True)
-    time.sleep(1)
-    green(False)
+    lcd_log('Checked\nIn')
+    #green(True)
+    #time.sleep(1)
+    #green(False)
 
 def blink_check_out():
-    red(True)
-    time.sleep(1)
-    red(False)
+    lcd_log('Checked\nOut')
+    #red(True)
+    #time.sleep(1)
+    #red(False)
 
-# Welcome message
+lcd = LCDInit()
+# Welcome message for LCD and console
+lcd.message('Welcome ...')
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 
 # Contact the backend on start up
@@ -127,7 +158,7 @@ while continue_reading:
                     blink_check_out()
             else:
                 blink_error()
-            time.sleep(5)
+            #time.sleep(5)
         else:
             log("Authentication error")
             blink_error()
