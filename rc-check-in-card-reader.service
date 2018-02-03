@@ -8,6 +8,9 @@ Type=idle
 Restart=always
 RestartSec=3
 ExecStart=/usr/bin/python /opt/rc-check-in-card-reader/Read.py
+Environment=RC_CHECK_IN_SERVER=https://rc-check-in-backend.herokuapp.com
+Environment=RC_CHECK_IN_USERNAME=foo
+Environment=RC_CHECK_IN_PASSWORD=bar
 
 [Install]
 WantedBy=multi-user.target
