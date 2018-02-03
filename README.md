@@ -14,6 +14,8 @@ cd SPI-Py
 sudo python setup.py install
 ```
 
+You may also need to add/uncomment `device_tree_param=spi=on` to `/boot/config.txt`.
+
 ## Pins
 You can use [this](http://i.imgur.com/y7Fnvhq.png) image for reference.
 
