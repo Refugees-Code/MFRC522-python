@@ -63,6 +63,8 @@ def blink_check_out():
 lcd.main()
 
 # Welcome message
+lcd.clear()
+lcd_log('Initializing ...')
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 
 # Contact the backend on start up
