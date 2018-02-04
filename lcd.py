@@ -107,10 +107,13 @@ def lcd_string(message,line):
   for i in range(LCD_WIDTH):
     lcd_display(ord(message[i]),LCD_CHR)
 
+def lcd_clear():
+  lcd_display(0x01, LCD_CMD)
+
 def lcd_message(message):
   lcd_string(message, LCD_LINE_1)
   time.sleep(3)
-  lcd_display(0x01, LCD_CMD)
+  lcd_clear()
 
 if __name__ == '__main__':
 
@@ -119,5 +122,5 @@ if __name__ == '__main__':
   except KeyboardInterrupt:
     pass
   finally:
-    lcd_display(0x01, LCD_CMD)
+    lcd_clear()
     GPIO.cleanup()

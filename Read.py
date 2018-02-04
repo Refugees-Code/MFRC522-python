@@ -28,12 +28,6 @@ def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
     sys.stdout.flush()
 
-#def green(on):
-#    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
-
-#def red(on):
-#    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
-
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
     global continue_reading
@@ -43,31 +37,15 @@ def end_read(signal,frame):
 
 def blink_error():
     lcd.lcd_message("ERROR")
-#    for i in range(0,3):
-#        red(True)
-#        time.sleep(0.1)
-#        red(False)
-#        time.sleep(0.1)
 
 def blink_hello():
     lcd.lcd_message("HELLO")
-#    red(True)
-#    green(True)
-#    time.sleep(1)
-#    red(False)
-#    green(False)
 
 def blink_check_in():
     lcd.lcd_message("Welcome")
-#    green(True)
-#    time.sleep(1)
-#    green(False)
 
 def blink_check_out():
     lcd.lcd_message("Goodbye")
-#    red(True)
-#    time.sleep(1)
-#    red(False)
 
 # LCD
 lcd.main()
@@ -131,10 +109,11 @@ while continue_reading:
             checkinStatus = resp.status_code
             log("Request /checkin response: " + str(checkinStatus))
             if checkinStatus == 200:
-                if resp.content == 'true':
-                    blink_check_in()
-		else:
-                    blink_check_out()
+		log("response" + str(resp))
+                #if resp.content == 'true':
+                #    blink_check_in()
+		#else:
+                #    blink_check_out()
             else:
                 blink_error()
             time.sleep(5)
