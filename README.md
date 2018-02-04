@@ -16,7 +16,7 @@ sudo python setup.py install
 
 You may also need to add/uncomment `device_tree_param=spi=on` to `/boot/config.txt`.
 
-## Pins
+## Pins for the NFC card reader
 You can use [this](https://www.raspberrypi.org/documentation/usage/gpio-plus-and-raspi2/README.md) for reference.
 
 | Name | Pin # | Pin name   |
@@ -30,10 +30,14 @@ You can use [this](https://www.raspberrypi.org/documentation/usage/gpio-plus-and
 | RST  | 22    | GPIO25     |
 | 3.3V | 1     | 3V3        |
 
-## Setup Guide
+#### Setup Guide
 
 A good step-by-step guide can be found here:
 http://raspmer.blogspot.co.at/2015/07/how-to-use-rfid-rc522-on-raspbian.html
+
+## Pins for the LCD display
+
+![LCD display](89u9crv.png)
 
 ## Environment Variables
 
