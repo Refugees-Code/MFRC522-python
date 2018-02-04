@@ -10,6 +10,7 @@ import signal
 import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
+import lcd
 
 server = 'https://rc-check-in-backend.herokuapp.com'
 #sadra_server = 'https://xsadra.cf/checkin/data.php'
@@ -27,11 +28,11 @@ def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
     sys.stdout.flush()
 
-def green(on):
-    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
+#def green(on):
+#    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
 
-def red(on):
-    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
+#def red(on):
+#    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
@@ -41,28 +42,37 @@ def end_read(signal,frame):
     GPIO.cleanup()
 
 def blink_error():
-    for i in range(0,3):
-        red(True)
-        time.sleep(0.1)
-        red(False)
-        time.sleep(0.1)
+    lcd.lcd_message("ERROR")
+#    for i in range(0,3):
+#        red(True)
+#        time.sleep(0.1)
+#        red(False)
+#        time.sleep(0.1)
 
 def blink_hello():
-    red(True)
-    green(True)
-    time.sleep(1)
-    red(False)
-    green(False)
+    lcd.lcd_message("HELLO")
+#    red(True)
+#    green(True)
+#    time.sleep(1)
+#    red(False)
+#    green(False)
 
 def blink_check_in():
-    green(True)
-    time.sleep(1)
-    green(False)
+    lcd.lcd_message("Welcome")
+#    green(True)
+#    time.sleep(1)
+#    green(False)
 
 def blink_check_out():
-    red(True)
-    time.sleep(1)
-    red(False)
+    lcd.lcd_message("Goodbye")
+#    red(True)
+#    time.sleep(1)
+#    red(False)
+
+# LCD
+lcd.main()
+
+lcd.lcd_string("HELLO WORLD", lcd.LCD_LINE_1)
 
 # Welcome message
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
