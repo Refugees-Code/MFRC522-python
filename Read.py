@@ -26,10 +26,10 @@ continue_reading = True
 
 def lcd_log(message):
     #lcd.message('IP %s' %(ipaddr))
-    if len(message > 16)
+    if len(message > 16):
         lcd.lcd_message('%s\n' %(message[0:16]), lcd.LCD_LINE_1)
         lcd.lcd_message(message[16:], lcd.LCD_LINE_2)
-    else
+    else:
         lcd.lcd_message(message, lcd.LCD_LINE_1)
     time.sleep(5)
     lcd.clear()
