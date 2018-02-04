@@ -2,14 +2,14 @@
 import RPi.GPIO as GPIO
 import time
 sleep = time.sleep
- 
-# Define GPIO to LCD mapping
-LCD_RS = 18
-LCD_E  = 23
-LCD_D4 = 12
-LCD_D5 = 16
-LCD_D6 = 20
-LCD_D7 = 21
+
+# Define Pins to LCD mapping (GPIO in comments)
+LCD_RS = 12 #18
+LCD_E  = 16 #23
+LCD_D4 = 32 #12
+LCD_D5 = 36 #16
+LCD_D6 = 38 #20
+LCD_D7 = 40 #21
  
 # Define some device constants
 LCD_WIDTH = 16    # Maximum characters per line
@@ -26,7 +26,7 @@ E_DELAY = 0.0005
 def main():
     # Main program block
     GPIO.setwarnings(False)
-    GPIO.setmode(GPIO.BCM)       # Use BCM GPIO numbers
+    GPIO.setmode(GPIO.BOARD)     # Use BOARD GPIO numbers
     GPIO.setup(LCD_E, GPIO.OUT)  # E
     GPIO.setup(LCD_RS, GPIO.OUT) # RS
     GPIO.setup(LCD_D4, GPIO.OUT) # DB4
