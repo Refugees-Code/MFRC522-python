@@ -24,7 +24,7 @@ continue_reading = True
 #subprocess.call(["gpio", "mode", "0", "out"])
 #subprocess.call(["gpio", "mode", "1", "out"])
 
-def lcd_log(message)
+def lcd_log(message):
     #lcd.message('IP %s' %(ipaddr))
     if len(message > 16)
         lcd.lcd_message('%s\n' %(message[0:16]), lcd.LCD_LINE_1)
