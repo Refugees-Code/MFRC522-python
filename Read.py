@@ -31,10 +31,8 @@ def lcd_log(message):
         lcd.lcd_string(message[16:], lcd.LCD_LINE_2)
     else:
         lcd.lcd_string(message, lcd.LCD_LINE_1)
-    time.sleep(5)
+    time.sleep(3)
     lcd.clear()
-    
-    
 
 def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
@@ -53,11 +51,11 @@ def blink_error():
 def blink_hello():
     lcd_log("HELLO")
 
-def blink_check_in():
-    lcd_log("Welcome")
+def blink_check_in(name):
+    lcd_log("Welcome " + name)
 
-def blink_check_out():
-    lcd_log("Goodbye")
+def blink_check_out(name):
+    lcd_log("Goodbye " + name)
 
 # LCD
 lcd.main()
@@ -121,14 +119,16 @@ while continue_reading:
             checkinStatus = resp.status_code
             log("Request /checkin response: " + str(checkinStatus))
             if checkinStatus == 200:
-		log("response" + str(resp))
-                #if resp.content == 'true':
-                #    blink_check_in()
-		#else:
-                #    blink_check_out()
+                dict = resp.json()
+                name = dict['name']
+                checkedIn = dict['checkedIn']
+                log(name + ": " + str(checkedIn))
+                if checkedIn == True:
+                    blink_check_in(name)
+                else:
+                    blink_check_out(name)
             else:
                 blink_error()
-            #time.sleep(5)
         else:
             log("Authentication error")
             blink_error()

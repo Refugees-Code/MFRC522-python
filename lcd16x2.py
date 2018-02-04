@@ -10,19 +10,19 @@ LCD_D4 = 32 #12
 LCD_D5 = 36 #16
 LCD_D6 = 38 #20
 LCD_D7 = 40 #21
- 
+
 # Define some device constants
 LCD_WIDTH = 16    # Maximum characters per line
 LCD_CHR = True
 LCD_CMD = False
- 
+
 LCD_LINE_1 = 0x80 # LCD RAM address for the 1st line
 LCD_LINE_2 = 0xC0 # LCD RAM address for the 2nd line
- 
+
 # Timing constants
 E_PULSE = 0.0005
 E_DELAY = 0.0005
- 
+
 def main():
     # Main program block
     # GPIO.setwarnings(False)
@@ -33,33 +33,28 @@ def main():
     GPIO.setup(LCD_D5, GPIO.OUT) # DB5
     GPIO.setup(LCD_D6, GPIO.OUT) # DB6
     GPIO.setup(LCD_D7, GPIO.OUT) # DB7
-    
+
     # Initialise display
     lcd_init()
- 
-    lcd_string("Electronics Hub ",LCD_LINE_1)
-    lcd_string("    Presents    ",LCD_LINE_2)
 
-    sleep(3) # 3 second delay
-      
 def clear():
     lcd_display(0x01,LCD_CMD)
-    
+
 def lcd_init():
   lcd_display(0x28,LCD_CMD) # Selecting 4 - bit mode with two rows
   lcd_display(0x0C,LCD_CMD) # Display On,Cursor Off, Blink Off
   lcd_display(0x01,LCD_CMD) # Clear display
 
   sleep(E_DELAY)
- 
+
 def lcd_display(bits, mode):
   # Send byte to data pins
   # bits = data
   # mode = True  for character
   #        False for command
- 
+
   GPIO.output(LCD_RS, mode) # RS
- 
+
   # High bits
   GPIO.output(LCD_D4, False)
   GPIO.output(LCD_D5, False)
@@ -73,10 +68,10 @@ def lcd_display(bits, mode):
     GPIO.output(LCD_D6, True)
   if bits&0x80==0x80:
     GPIO.output(LCD_D7, True)
- 
+
   # Toggle 'Enable' pin
   lcd_toggle_enable()
- 
+
   # Low bits
   GPIO.output(LCD_D4, False)
   GPIO.output(LCD_D5, False)
@@ -90,10 +85,10 @@ def lcd_display(bits, mode):
     GPIO.output(LCD_D6, True)
   if bits&0x08==0x08:
     GPIO.output(LCD_D7, True)
- 
+
   # Toggle 'Enable' pin
   lcd_toggle_enable()
- 
+
 def lcd_toggle_enable():
   # Toggle enable
   time.sleep(E_DELAY)
@@ -101,19 +96,19 @@ def lcd_toggle_enable():
   time.sleep(E_PULSE)
   GPIO.output(LCD_E, False)
   time.sleep(E_DELAY)
- 
+
 def lcd_string(message,line):
   # Send string to display
- 
+
   message = message.ljust(LCD_WIDTH," ")
- 
+
   lcd_display(line, LCD_CMD)
- 
+
   for i in range(LCD_WIDTH):
     lcd_display(ord(message[i]),LCD_CHR)
- 
+
 if __name__ == '__main__':
- 
+
   try:
     main()
   except KeyboardInterrupt:
