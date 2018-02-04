@@ -42,15 +42,11 @@ def clear():
 
 def lcd_init():
 	# Hard reset of the LCD (chaning from 8 bit mode 3 time and then 4 bit mode)
-	for x in range(0, 5):
+	for x in range(0, 3):
 		lcd_display(0x38, LCD_CMD)
-		sleep(0.3)
-		clear()
-		sleep(0.3)
-	lcd_display(0x33, LCD_CMD)
-	sleep(0.2)
-	lcd_display(0X32, LCD_CMD)
-	#lcd_display(0x28,LCD_CMD) # Selecting 4 - bit mode with two rows
+		sleep(0.2)
+	lcd_display()
+	lcd_display(0x28,LCD_CMD) # Selecting 4 - bit mode with two rows
   	lcd_display(0x0C,LCD_CMD) # Display On,Cursor Off, Blink Off
   	lcd_display(0x01,LCD_CMD) # Clear display
 	sleep(E_DELAY)
