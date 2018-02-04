@@ -25,7 +25,7 @@ E_DELAY = 0.0005
  
 def main():
     # Main program block
-    GPIO.setwarnings(False)
+    # GPIO.setwarnings(False)
     GPIO.setmode(GPIO.BOARD)     # Use BOARD GPIO numbers
     GPIO.setup(LCD_E, GPIO.OUT)  # E
     GPIO.setup(LCD_RS, GPIO.OUT) # RS
