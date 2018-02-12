@@ -35,10 +35,6 @@ You can use [this](https://www.raspberrypi.org/documentation/usage/gpio-plus-and
 A good step-by-step guide can be found here:
 http://raspmer.blogspot.co.at/2015/07/how-to-use-rfid-rc522-on-raspbian.html
 
-## Pins for the LCD display
-
-![LCD display](89u9crv.png)
-
 ## Environment Variables
 
 The following environment variables need to be set, for example exported from a script in `/etc/profile.d/rc-check-in-env.sh`.
