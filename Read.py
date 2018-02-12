@@ -134,7 +134,7 @@ while continue_reading:
             else:
                 blink_error()
 
-            time.sleep(5)
+            time.sleep(2)
 
         else:
             log("Authentication error")
