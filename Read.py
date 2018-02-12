@@ -10,33 +10,27 @@ import signal
 import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
-import lcd16x2 as lcd
 
-#sadra_server = 'https://xsadra.cf/checkin/data.php'
+server = 'https://rc-check-in-backend.herokuapp.com'
 server = os.environ['RC_CHECK_IN_SERVER']
 username = os.environ['RC_CHECK_IN_USERNAME']
 password = os.environ['RC_CHECK_IN_PASSWORD']
 
 continue_reading = True
 
-
 # Set gpio mode for leds
-#subprocess.call(["gpio", "mode", "0", "out"])
-#subprocess.call(["gpio", "mode", "1", "out"])
-
-def lcd_log(message):
-    #lcd.message('IP %s' %(ipaddr))
-    if len(message) > 16:
-        lcd.lcd_string('%s\n' %(message[0:16]), lcd.LCD_LINE_1)
-        lcd.lcd_string(message[16:], lcd.LCD_LINE_2)
-    else:
-        lcd.lcd_string(message, lcd.LCD_LINE_1)
-    time.sleep(3)
-    lcd.clear()
+subprocess.call(["gpio", "mode", "0", "out"])
+subprocess.call(["gpio", "mode", "1", "out"])
 
 def log(msg):
     print time.strftime("%Y-%m-%d %H:%M") + ": " + msg
     sys.stdout.flush()
+
+def green(on):
+    subprocess.call(["gpio", "write", "0", "1" if on else "0"])
+
+def red(on):
+    subprocess.call(["gpio", "write", "1", "1" if on else "0"])
 
 # Capture SIGINT for cleanup when the script is aborted
 def end_read(signal,frame):
@@ -46,23 +40,30 @@ def end_read(signal,frame):
     GPIO.cleanup()
 
 def blink_error():
-    lcd_log("ERROR")
+    for i in range(0,3):
+        red(True)
+        time.sleep(0.1)
+        red(False)
+        time.sleep(0.1)
 
 def blink_hello():
-    lcd_log("HELLO")
+    red(True)
+    green(True)
+    time.sleep(1)
+    red(False)
+    green(False)
 
-def blink_check_in(name):
-    lcd_log("Welcome " + name)
+def blink_check_in():
+    green(True)
+    time.sleep(1)
+    green(False)
 
-def blink_check_out(name):
-    lcd_log("Goodbye " + name)
-
-# LCD
-lcd.main()
+def blink_check_out():
+    red(True)
+    time.sleep(1)
+    red(False)
 
 # Welcome message
-lcd.clear()
-lcd_log('Initializing ...')
 log("Welcome to the rc-check-in-card-reader! Press Ctrl-C to stop.")
 
 # Contact the backend on start up
@@ -108,27 +109,33 @@ while continue_reading:
 
         # Check if authenticated
         if status == MIFAREReader.MI_OK:
+
             MIFAREReader.MFRC522_Read(8)
             MIFAREReader.MFRC522_StopCrypto1()
 
-            #Send data to Sadra Server for Check in BOT
-#            requests.post(sadra_server,data={'userid': uidString})
-
-            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username,password))
+            resp = requests.get(server + '/people/' + uidString + '/checkin', auth=HTTPBasicAuth(username, password))
 
             checkinStatus = resp.status_code
             log("Request /checkin response: " + str(checkinStatus))
+
             if checkinStatus == 200:
                 dict = resp.json()
                 name = dict['name']
                 checkedIn = dict['checkedIn']
                 log(name + ": " + str(checkedIn))
                 if checkedIn == True:
-                    blink_check_in(name)
+                    blink_check_in()
                 else:
-                    blink_check_out(name)
+                    blink_check_out()
+
+		#Send data to Sadra Server for Check in BOT
+                requests.post(sadra_server, data={'userid': uidString, 'checkedIn': checkedIn})
+
             else:
                 blink_error()
+
+            time.sleep(5)
+
         else:
             log("Authentication error")
             blink_error()
