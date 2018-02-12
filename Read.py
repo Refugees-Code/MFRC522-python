@@ -11,7 +11,7 @@ import subprocess
 import requests
 from requests.auth import HTTPBasicAuth
 
-server = 'https://rc-check-in-backend.herokuapp.com'
+sadra_server = 'https://xsadra.cf/checkin/data.php'
 server = os.environ['RC_CHECK_IN_SERVER']
 username = os.environ['RC_CHECK_IN_USERNAME']
 password = os.environ['RC_CHECK_IN_PASSWORD']
